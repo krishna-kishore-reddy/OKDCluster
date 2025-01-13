@@ -55,7 +55,7 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
 2. Add or modify the following settings:
    ```
    options {
-        listen-on port 53 { 127.0.0.1; 192.168.1.7; 192.168.1.8; };
+        listen-on port 53 { 127.0.0.1; 192.168.1.7; 192.168.1.8; };   #make sure IP address are entered here, this is mandatory for name resolution
         listen-on-v6 port 53 { ::1; };
         directory       "/var/named";
         dump-file       "/var/named/data/cache_dump.db";
@@ -63,7 +63,7 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
         memstatistics-file "/var/named/data/named_mem_stats.txt";
         secroots-file   "/var/named/data/named.secroots";
         recursing-file  "/var/named/data/named.recursing";
-        allow-query     { any; 192.168.1.7; 192.168.1.8; };
+        allow-query     { any; 192.168.1.7; 192.168.1.8; };  #make sure IP address are entered here, this is mandatory for name resolution
 
         /* 
          - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
@@ -91,13 +91,13 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
 
    key "rndc-key" {
         algorithm hmac-sha256;
-        secret "6D+hLqJp86QumNNZzJXf1DWgbO93z5R2qPuolMgVRYw=";
+        secret "6D+hLqJp86QumNNZzJXf1DWgbO93z5R2qPuolMgVRYw=";   #make sure you have entered the corrcet key this is mandatory for ddns setup.
    };
 
 
    logging {
         channel default_debug {
-                file "/var/log/named/update.log";
+                file "/var/log/named/update.log";  #Make sure this file is generated otherwise service won't get restart also check the permession's as well, also this will also end up with an error.
                 severity debug 3;
                 print-time yes;
         };
@@ -107,7 +107,7 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
 
    zone "trintech.com" IN {
     type master;
-    file "example.com.zone";
+    file "trintech.com.zone";
     allow-update { key rndc-key; };
    };
 
@@ -124,11 +124,11 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
 
 #### Create Forward Zone File
 
-1. Define the forward zone in `/etc/named.conf` or `/etc/bind/named.conf.local`:
+1. Define the forward zone in `/etc/named.conf` or `/etc/bind/named.conf.local`:   
    ```
    zone "example.com" IN {
        type master;
-       file "/var/named/example.com.zone";  # Adjust path for your distribution
+       file "/var/named/example.com.zone";  # Adjust path for your distribution   #this is already created in the named.conf file no need to create any file.
    };
    ```
 2. Create the zone file:
@@ -138,7 +138,7 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
 3. Add the following content:
    ```
    $TTL 86400
-   @    IN    SOA   dns-server.example.com. admin.example.com. (
+   @    IN    SOA   dns-server.example.com. admin.example.com. (   #Like this Simillarly we have to generate for the reverse lookup also.
                 2025011301 ; Serial
                 3600       ; Refresh
                 1800       ; Retry
