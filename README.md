@@ -80,38 +80,38 @@ sudo hostnamectl set-hostname dns-server
 
         /* https://fedoraproject.org/wiki/Changes/CryptoPolicy */
         include "/etc/crypto-policies/back-ends/bind.config";
-};
+   };
 
-key "rndc-key" {
+   key "rndc-key" {
         algorithm hmac-sha256;
         secret "6D+hLqJp86QumNNZzJXf1DWgbO93z5R2qPuolMgVRYw=";
-};
+   };
 
 
-logging {
+   logging {
         channel default_debug {
                 file "/var/log/named/update.log";
                 severity debug 3;
                 print-time yes;
         };
-};
+   };
 
 
 
-zone "trintech.com" IN {
+   zone "trintech.com" IN {
     type master;
     file "example.com.zone";
     allow-update { key rndc-key; };
-};
+   };
 
-zone "1.168.192.in-addr.arpa" IN {
+   zone "1.168.192.in-addr.arpa" IN {
     type master;
     file "1.168.192.zone";
     allow-update { key rndc-key; };
-};
+   };
 
-include "/etc/named.rfc1912.zones";
-include "/etc/named.root.key";
+   include "/etc/named.rfc1912.zones";
+   include "/etc/named.root.key";
 
    ```
 
