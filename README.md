@@ -48,11 +48,71 @@ sudo hostnamectl set-hostname dns-server
 2. Add or modify the following settings:
    ```
    options {
-       listen-on port 53 { 127.0.0.1; 192.168.1.1; }; # Replace with server's static IP
-       directory "/var/named";  # Zone files directory
-       allow-query { any; };
-       recursion yes;  # Enable recursive queries if needed
-   };
+        listen-on port 53 { 127.0.0.1; 192.168.1.7; 192.168.1.8; };
+        listen-on-v6 port 53 { ::1; };
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        secroots-file   "/var/named/data/named.secroots";
+        recursing-file  "/var/named/data/named.recursing";
+        allow-query     { any; 192.168.1.7; 192.168.1.8; };
+
+        /* 
+         - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
+         - If you are building a RECURSIVE (caching) DNS server, you need to enable 
+           recursion. 
+         - If your recursive DNS server has a public IP address, you MUST enable access 
+           control to limit queries to your legitimate users. Failing to do so will
+           cause your server to become part of large scale DNS amplification 
+           attacks. Implementing BCP38 within your network would greatly
+           reduce such attack surface 
+        */
+        recursion yes;
+
+        dnssec-validation yes;
+
+        managed-keys-directory "/var/named/dynamic";
+        geoip-directory "/usr/share/GeoIP";
+
+        pid-file "/run/named/named.pid";
+        session-keyfile "/run/named/session.key";
+
+        /* https://fedoraproject.org/wiki/Changes/CryptoPolicy */
+        include "/etc/crypto-policies/back-ends/bind.config";
+};
+
+key "rndc-key" {
+        algorithm hmac-sha256;
+        secret "6D+hLqJp86QumNNZzJXf1DWgbO93z5R2qPuolMgVRYw=";
+};
+
+
+logging {
+        channel default_debug {
+                file "/var/log/named/update.log";
+                severity debug 3;
+                print-time yes;
+        };
+};
+
+
+
+zone "trintech.com" IN {
+    type master;
+    file "example.com.zone";
+    allow-update { key rndc-key; };
+};
+
+zone "1.168.192.in-addr.arpa" IN {
+    type master;
+    file "1.168.192.zone";
+    allow-update { key rndc-key; };
+};
+
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";
+
    ```
 
 #### Create Forward Zone File
