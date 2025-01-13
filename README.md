@@ -40,6 +40,13 @@ sudo hostnamectl set-hostname dns-server
 
 #### Main Configuration File: `/etc/named.conf` or `/etc/bind/named.conf`
 
+Create RNDC Key 
+
+```bash
+   rndc-confgen -a -k "rndc-key"
+```
+value will be stored under /etc as rndc.key i.e /etc/rndc.key 
+
 1. Open the configuration file for editing:
    ```bash
    sudo nano /etc/named.conf  # RHEL/CentOS
@@ -171,15 +178,34 @@ dig @192.168.1.1 example.com
    ```
 2. Configure the DHCP server settings:
    ```
-   option domain-name "example.com";
-   option domain-name-servers 192.168.1.1;
-   default-lease-time 600;
-   max-lease-time 7200;
-
+   ddns-update-style interim;
+   ignore client-updates;
+   
+   key "rndc-key" {
+       algorithm hmac-sha256;
+       secret "6D+hLqJp86QumNNZzJXf1DWgbO93z5R2qPuolMgVRYw=";
+   };
+   
+   zone trintech.com. {
+       primary 127.0.0.1;
+       key rndc-key;
+   }
+   
+   zone 17.168.192.in-addr.arpa. {
+       primary 127.0.0.1;
+       key rndc-key;
+   }
+   
    subnet 192.168.1.0 netmask 255.255.255.0 {
-       range 192.168.1.100 192.168.1.200;
-       option routers 192.168.1.1;
-       option broadcast-address 192.168.1.255;
+       range 192.168.1.20 192.168.1.30;
+       option routers 192.168.1.7;
+       option routers 192.168.1.8;
+       option domain-name "trintech.com";
+       option domain-name-servers 192.168.1.7;
+       ddns-domainname "trintech.com";
+       ddns-rev-domainname "in-addr.arpa";
+       send host-name = gethostname();
+   
    }
    ```
 
