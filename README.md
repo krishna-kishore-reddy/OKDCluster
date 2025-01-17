@@ -1,7 +1,3 @@
-# OKDCluster
-How to setup the OKD cluster in OnPrem env step by step guide.
-
-
 # Setting Up DNS and DHCP Servers: Step-by-Step Guide
 
 This guide provides detailed steps to build and configure DNS and DHCP servers, ensuring seamless network functionality. The setup uses **BIND** for DNS and **ISC DHCP Server** for DHCP.
