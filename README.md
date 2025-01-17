@@ -336,6 +336,10 @@ sudo systemctl enable isc-dhcp-server
    - /etc/dhcp/dhcpd.conf #DHCP Configuration file. -rw-r--r--. 1 root root 1034 Jan 17 09:01 /etc/dhcp/dhcpd.conf
    - /var/lib/dhcpd/dhcpd.leases #This file will help to check the IP's assigned by the DHCP server, leases.
    - Make sure SELinux is disabled. Otherwise you have to set the permession to the files accordingly, if SELinux is enabled you may see the error in creating a file for logs of named service.
+   - 210  chown named:named /var/log/named-update.log
+  211  chmod 640 /var/log/named-update.log
+  214  semanage fcontext -a -t named_log_t "/var/log/named-update.log"
+  215  restorecon -v /var/log/named-update.log
 
 ---
 
