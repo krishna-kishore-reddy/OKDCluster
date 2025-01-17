@@ -125,6 +125,8 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
    };
    ```
 
+   - To check whether the configuration is correct or not you have to use the command #named-checkconf
+
 #### Create Forward Zone File
 
 1. Define the forward zone in `/etc/named.conf` or `/etc/bind/named.conf.local`:   
@@ -167,6 +169,9 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
    dnsmaster IN    A     192.168.0.20
 
    ```
+   - To check whether configuration is correct or not you have to use the below commands.
+   - named-checkzone inarm.in /var/named/inarm.in.zone
+   - named-checkzone 0.168.192.in-addr.arpa /var/named/reverse.zone
 
 #### Restart DNS Service
 
