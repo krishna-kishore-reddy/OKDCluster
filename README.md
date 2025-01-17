@@ -55,7 +55,7 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
 2. Add or modify the following settings:
    ```
    options {
-        listen-on port 53 { 127.0.0.1; 192.168.1.7; 192.168.1.8; };   #make sure IP address are entered here, this is mandatory for name resolution
+        listen-on port 53 { 127.0.0.1; 192.168.0.20; };
         listen-on-v6 port 53 { ::1; };
         directory       "/var/named";
         dump-file       "/var/named/data/cache_dump.db";
@@ -63,7 +63,12 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
         memstatistics-file "/var/named/data/named_mem_stats.txt";
         secroots-file   "/var/named/data/named.secroots";
         recursing-file  "/var/named/data/named.recursing";
-        allow-query     { any; 192.168.1.7; 192.168.1.8; };  #make sure IP address are entered here, this is mandatory for name resolution
+        allow-query     { any; 192.168.0.0/24; 8.8.8.8; 8.8.4.4; };
+        forwarders {
+        8.8.8.8;  # Google DNS
+        8.8.4.4;  # Google DNS
+        };
+        forward only;
 
         /* 
          - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
@@ -77,7 +82,7 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
         */
         recursion yes;
 
-        dnssec-validation yes;
+        dnssec-validation no;
 
         managed-keys-directory "/var/named/dynamic";
         geoip-directory "/usr/share/GeoIP";
@@ -88,38 +93,36 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
         /* https://fedoraproject.org/wiki/Changes/CryptoPolicy */
         include "/etc/crypto-policies/back-ends/bind.config";
    };
-
+   
+   
    key "rndc-key" {
-        algorithm hmac-sha256;
-        secret "6D+hLqJp86QumNNZzJXf1DWgbO93z5R2qPuolMgVRYw=";   #make sure you have entered the corrcet key this is mandatory for ddns setup.
+           algorithm hmac-sha256;
+           secret "smLqZ7l7b4ep25cfZYZXhjKwu3Qq5Crk4hJTdUE7j4Q=";
    };
-
-
-   logging {
-        channel default_debug {
-                file "/var/log/named/update.log";  #Make sure this file is generated otherwise service won't get restart also check the permession's as well, also this will also end up with an error.
-                severity debug 3;
-                print-time yes;
-        };
+   
+   zone "inarm.in" IN {
+           type master;
+           file "inarm.in.zone";
+           allow-update { key rndc-key; };
    };
-
-
-
-   zone "trintech.com" IN {
-    type master;
-    file "trintech.com.zone";
-    allow-update { key rndc-key; };
+   
+   zone "0.168.192.in-addr.arpa"   IN {
+           type master;
+           file "reverse.zone";
+           allow-update { key rndc-key; };
    };
-
-   zone "1.168.192.in-addr.arpa" IN {
-    type master;
-    file "1.168.192.zone";
-    allow-update { key rndc-key; };
-   };
-
+   
    include "/etc/named.rfc1912.zones";
    include "/etc/named.root.key";
-
+   
+   logging {
+       channel update_debug {
+           file "/var/log/named-update.log";
+           severity debug 3;
+       };
+       category update { update_debug; };
+       category security { update_debug; };
+   };
    ```
 
 #### Create Forward Zone File
@@ -138,25 +141,42 @@ value will be stored under /etc as rndc.key i.e /etc/rndc.key
 3. Add the following content:
    ```
    $TTL 86400
-   @    IN    SOA   dns-server.example.com. admin.example.com. (   #Like this Simillarly we have to generate for the reverse lookup also.
+   @    IN    SOA   dnsmaster.inarm.in. krishnakishore@inarm.in. (   #Like this Simillarly we have to generate for the reverse lookup also.
                 2025011301 ; Serial
                 3600       ; Refresh
                 1800       ; Retry
                 604800     ; Expire
                 86400      ; Minimum TTL
    )
-   @    IN    NS    dns-server.example.com.
-   dns-server IN    A     192.168.1.1
-   www        IN    A     192.168.1.2
+   @    IN    NS    dnsmaster.inarm.in.
+   dnsmaster IN    A     192.168.0.20
+   
+   ```
+
+   ```
+   $TTL 86400
+   @    IN    SOA   dnsmaster.inarm.in. krishnakishore@inarm.in. (   #Like this Simillarly we have to generate for the reverse lookup also.
+                2025011301 ; Serial
+                3600       ; Refresh
+                1800       ; Retry
+                604800     ; Expire
+                86400      ; Minimum TTL
+   )
+   @    IN    NS    dnsmaster.inarm.in.
+   20   IN    PTR     dnsmaster.inarm.in.
+   dnsmaster IN    A     192.168.0.20
+
    ```
 
 #### Restart DNS Service
 
 Restart and enable the DNS server:
 ```bash
+sudo systemctl stop firewalld
+sudo systemctl disable firewalld
 sudo systemctl restart named  # RHEL/CentOS
 sudo systemctl restart bind9  # Ubuntu
-sudo systemctl enable named   # Ensure it starts on boot
+sudo systemctl enable --now named   # Ensure it starts on boot
 ```
 
 #### Test DNS Configuration
@@ -178,44 +198,48 @@ dig @192.168.1.1 example.com
    ```
 2. Configure the DHCP server settings:
    ```
-   ddns-update-style interim;
-   ignore client-updates;
-   
    key "rndc-key" {
-       algorithm hmac-sha256;
-       secret "6D+hLqJp86QumNNZzJXf1DWgbO93z5R2qPuolMgVRYw=";
+        algorithm hmac-sha256;
+        secret "smLqZ7l7b4ep25cfZYZXhjKwu3Qq5Crk4hJTdUE7j4Q=";
    };
+   ddns-updates on;
+   ddns-update-style interim;
+   update-static-leases on;
+   use-host-decl-names on;
    
-   zone trintech.com. {
-       primary 127.0.0.1;
-       key rndc-key;
+   zone inarm.in. {
+           primary 192.168.0.20;
+           key rndc-key;
    }
    
-   zone 17.168.192.in-addr.arpa. {
-       primary 127.0.0.1;
-       key rndc-key;
+   zone 0.168.192.in-addr.arpa. {
+           primary 192.168.0.20;
+           key rndc-key;
    }
    
-   subnet 192.168.1.0 netmask 255.255.255.0 {
-       range 192.168.1.20 192.168.1.30;
-       option routers 192.168.1.7;
-       option routers 192.168.1.8;
-       option domain-name "trintech.com";
-       option domain-name-servers 192.168.1.7;
-       ddns-domainname "trintech.com";
-       ddns-rev-domainname "in-addr.arpa";
-       send host-name = gethostname();
-   
+   subnet 192.168.0.0 netmask 255.255.255.0 {
+           range 192.168.0.100 192.168.0.200;
+           option routers 192.168.0.1;
+           option domain-name-servers 192.168.0.20;
+           option domain-name "inarm.in";
+           ddns-domainname "inarm.in";
+           ddns-rev-domainname "in-addr.arpa";
+           send host-name = gethostname();
+           default-lease-time 600;
+           max-lease-time 7200;
+           send host-name "client-hostname";
+           use-host-decl-names on;
+           host clientone {
+           hardware ethernet 08:00:27:77:1F:8D;
+           fixed-address 192.168.0.100;
+        }
+           host clienttwo {
+           hardware ethernet 08:00:27:D4:E9:F7;
+           fixed-address 192.168.0.101;
+        }
    }
    ```
 
-### 2. **Assign Interfaces**
-
-Edit `/etc/default/isc-dhcp-server` (Ubuntu) or `/etc/sysconfig/dhcpd` (RHEL):
-```bash
-sudo nano /etc/default/isc-dhcp-server  # Ubuntu
-INTERFACESv4="eth0"  # Replace with your interface name
-```
 
 ### 3. **Restart DHCP Service**
 
@@ -299,6 +323,14 @@ sudo systemctl enable isc-dhcp-server
 2. **DHCP Not Assigning IPs**:
    - Ensure the subnet and range match the server’s network.
    - Check interface configuration in `/etc/default/isc-dhcp-server`.
+  
+3. **KEY Files to check**
+   - /var/named/inarm.in.zone #this is forward zone file, Permission for this file is -rw-r--r--. 1 named named  605 Jan 17 09:30 inarm.in.zone
+   - /var/named/reverse.zon #reverse lookup zone, -rw-r--r--. 1 named named  605 Jan 17 09:30 reverse.zone
+   - /etc/named.conf #DNS Configuration file. -rw-rw----. 1 root named 2210 Jan 16 21:39 /etc/named.conf
+   - /etc/dhcp/dhcpd.conf #DHCP Configuration file. -rw-r--r--. 1 root root 1034 Jan 17 09:01 /etc/dhcp/dhcpd.conf
+   - /var/lib/dhcpd/dhcpd.leases #This file will help to check the IP's assigned by the DHCP server, leases.
+   - Make sure SELinux is disabled. Otherwise you have to set the permession to the files accordingly, if SELinux is enabled you may see the error in creating a file for logs of named service.
 
 ---
 
