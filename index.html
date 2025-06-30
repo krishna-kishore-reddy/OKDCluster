@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Creative Designer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        .cursor-follower {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transition: all 0.3s ease;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            background: linear-gradient(-45deg, #0a0a0a, #1a1a2e, #16213e, #0f3460);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(-100px) rotate(180deg); opacity: 1; }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            animation: slideUp 1s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes textGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.8;
+            animation: fadeIn 1s ease-out 0.5s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 0.8; }
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .cta-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+        }
+
+        /* Sections */
+        .section {
+            padding: 100px 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section h2 {
+            font-size: 3rem;
+            margin-bottom: 50px;
+            text-align: center;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Work Grid */
+        .work-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .work-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .work-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .work-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #4ecdc4;
+        }
+
+        .work-item p {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* Skills Section */
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .skill-item {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .skill-item:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .skill-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            animation: spin 10s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            opacity: 0.9;
+        }
+
+        .about-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            animation: morphing 8s ease-in-out infinite;
+        }
+
+        @keyframes morphing {
+            0%, 100% { border-radius: 20px; }
+            25% { border-radius: 50% 20px 50% 20px; }
+            50% { border-radius: 20px 50% 20px 50%; }
+            75% { border-radius: 50px; }
+        }
+
+        /* Contact Section */
+        .contact-form {
+            max-width: 600px;
+            margin: 50px auto 0;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 50px;
+            background: rgba(0, 0, 0, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .social-links a {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            transform: scale(1.2) rotate(15deg);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .section { padding: 50px 20px; }
+            .nav-container { padding: 0 20px; }
+            .about-content { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+
+        /* Scroll Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Animated Background -->
+    <div class="bg-animation"></div>
+
+    <!-- Floating Particles -->
+    <div class="particles"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">Portfolio</div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#work">Work</a>
+                <a href="#skills">Skills</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Krishna Kishore Reddy</h1>
+            <p>Senior DevOps Engineer with 6+ years of experience in designing scalable infrastructure, Kubernetes, Docker, and cloud automation solutions.</p>
+            <a href="#work" class="cta-button">View My Work</a>
+        </div>
+    </section>
+
+    <!-- Work Section -->
+    <section id="work" class="section fade-in">
+        <h2>Things I've Done</h2>
+        <div class="work-grid">
+            <div class="work-item">
+                <h3>OpenCluster Infrastructure</h3>
+                <p>Designed and built OpenCluster from scratch, reducing deployment time from one week to 45 minutes using Ansible, Azure Pipelines, and Shell Scripts.</p>
+            </div>
+            <div class="work-item">
+                <h3>Certificate Manager</h3>
+                <p>Developed internal Certificate Manager eliminating external certificate costs, deployed in OpenShift cluster with automated certificate rotation.</p>
+            </div>
+            <div class="work-item">
+                <h3>DNS Migration & Automation</h3>
+                <p>Migrated Windows DNS to Linux-based system with Dynamic DNS implementation, reducing deployment time from 3 hours to 5 minutes.</p>
+            </div>
+            <div class="work-item">
+                <h3>Task Management API</h3>
+                <p>Built Python API-based web application for automated task management in Azure DevOps, streamlining workflow tracking and efficiency.</p>
+            </div>
+            <div class="work-item">
+                <h3>Container Infrastructure</h3>
+                <p>Executed container-based infrastructure reducing costs by 30% through optimized resource allocation using Kubernetes and Docker.</p>
+            </div>
+            <div class="work-item">
+                <h3>CI/CD Automation</h3>
+                <p>Automated Tableau application deployment reducing time from 3 hours to 30 minutes, implementing robust CI/CD pipelines.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section fade-in">
+        <h2>My Skills</h2>
+        <div class="skills-container">
+            <div class="skill-item">
+                <div class="skill-icon">☸️</div>
+                <h3>Kubernetes</h3>
+                <p>Container orchestration, scaling, and management</p>
+            </div>
+            <div class="skill-item">
+                <div class="skill-icon">🐳</div>
+                <h3>Docker</h3>
+                <p>Containerization and microservices architecture</p>
+            </div>
+            <div class="skill-item">
+                <div class="skill-icon">☁️</div>
+                <h3>Cloud Platforms</h3>
+                <p>AWS, Azure, OpenShift deployment and management</p>
+            </div>
+            <div class="skill-item">
+                <div class="skill-icon">🔧</div>
+                <h3>Infrastructure as Code</h3>
+                <p>Terraform, Ansible automation and configuration</p>
+            </div>
+            <div class="skill-item">
+                <div class="skill-icon">📊</div>
+                <h3>Monitoring</h3>
+                <p>Prometheus, Grafana, OpenTelemetry observability</p>
+            </div>
+            <div class="skill-item">
+                <div class="skill-icon">🔄</div>
+                <h3>CI/CD</h3>
+                <p>Azure Pipelines, GitHub Actions automation</p>
+            </div>
+            <div class="skill-item">
+                <div class="skill-icon">🐧</div>
+                <h3>Linux</h3>
+                <p>System administration and shell scripting</p>
+            </div>
+            <div class="skill-item">
+                <div class="skill-icon">🐍</div>
+                <h3>Python</h3>
+                <p>API development and automation scripting</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section fade-in">
+        <h2 style="animation: pulse 2s infinite, textGlow 3s ease-in-out infinite;">Get to Know Me</h2>
+        <div class="about-content">
+            <div class="about-text" style="animation: slideUp 1.2s cubic-bezier(.77,0,.18,1) both, fadeIn 1.5s 0.3s both;">
+                <p>
+                    <span style="display:inline-block; animation: fadeIn 1s 0.2s both, bounce 1.2s 0.2s;">I'm a highly skilled Senior DevOps Engineer with over 6 years of experience in designing, implementing, and managing scalable and reliable infrastructure. Currently working at Trintech India Pvt Ltd, I specialize in Kubernetes, Docker, Azure DevOps, and cloud automation solutions.</span>
+                </p>
+                <br>
+                <p>
+                    <span style="display:inline-block; animation: fadeIn 1s 0.5s both, bounce 1.2s 0.5s;">My expertise includes building OpenClusters, developing internal PKI solutions, automating CI/CD pipelines, and optimizing infrastructure costs. I'm passionate about mentoring teams, driving innovation, and implementing cutting-edge DevOps practices that transform business operations.</span>
+                </p>
+                <br>
+                <p style="animation: fadeIn 1s 0.8s both, bounce 1.2s 0.8s;"><strong>Education:</strong> Computer Science and Engineering (First Grade) from K.S.R.M College of Engineering, Kadapa</p>
+                <p style="animation: fadeIn 1s 1s both, bounce 1.2s 1s;"><strong>Contact:</strong> +91 9493612730 | krishnakishore@inarm.in | Bengaluru, India</p>
+            </div>
+            <div class="about-image" style="animation: morphing 8s ease-in-out infinite, bounce 2s infinite, glow 2s infinite;">
+                ⚙️ DevOps Expert ☸️
+            </div>
+        </div>
+    </section>
+
+    <!-- Skill Modal Popup -->
+    <div id="skill-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(10,10,20,0.85); z-index:20000; align-items:center; justify-content:center; transition:opacity 0.3s;">
+        <div id="skill-modal-content" style="background:rgba(30,40,60,0.98); border-radius:20px; padding:40px 30px; max-width:400px; width:90%; color:#fff; box-shadow:0 10px 40px #0008; position:relative; animation: slideUp 0.5s, modalPop 0.5s;">
+            <button id="skill-modal-close" style="position:absolute; top:15px; right:20px; background:none; border:none; color:#fff; font-size:1.8rem; cursor:pointer; transition:transform 0.2s;">
+                &times;
+            </button>
+            <div id="skill-modal-body"></div>
+        </div>
+    </div>
+    <style>
+        @keyframes modalPop {
+            0% { transform: scale(0.7); opacity: 0; }
+            60% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes glow {
+            0%,100% { box-shadow: 0 0 30px 5px #4ecdc4, 0 0 10px 2px #ff6b6b; }
+            50% { box-shadow: 0 0 60px 15px #ff6b6b, 0 0 30px 10px #4ecdc4; }
+        }
+        #skill-modal-content {
+            animation: modalPop 0.5s;
+        }
+        #skill-modal[style*="display: flex"] {
+            animation: fadeIn 0.3s;
+        }
+        #skill-modal-close:hover {
+            transform: scale(1.2) rotate(10deg);
+            color: #ff6b6b;
+        }
+
+        /* Additional Animations for Work Items */
+        .work-item {
+            animation: fadeInScale 0.8s cubic-bezier(.77,0,.18,1) both;
+        }
+        .work-item:nth-child(1) { animation-delay: 0.1s; }
+        .work-item:nth-child(2) { animation-delay: 0.2s; }
+        .work-item:nth-child(3) { animation-delay: 0.3s; }
+        .work-item:nth-child(4) { animation-delay: 0.4s; }
+        .work-item:nth-child(5) { animation-delay: 0.5s; }
+        .work-item:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.8) translateY(40px);}
+            100% { opacity: 1; transform: scale(1) translateY(0);}
+        }
+
+        /* Skills Animation */
+        .skill-item {
+            animation: fadeInScale 0.8s cubic-bezier(.77,0,.18,1) both;
+        }
+        .skill-item:nth-child(1) { animation-delay: 0.1s; }
+        .skill-item:nth-child(2) { animation-delay: 0.2s; }
+        .skill-item:nth-child(3) { animation-delay: 0.3s; }
+        .skill-item:nth-child(4) { animation-delay: 0.4s; }
+        .skill-item:nth-child(5) { animation-delay: 0.5s; }
+        .skill-item:nth-child(6) { animation-delay: 0.6s; }
+        .skill-item:nth-child(7) { animation-delay: 0.7s; }
+        .skill-item:nth-child(8) { animation-delay: 0.8s; }
+
+        /* Animate social icons in footer */
+        .social-links a {
+            animation: popIn 0.7s cubic-bezier(.77,0,.18,1) both;
+        }
+        .social-links a:nth-child(1) { animation-delay: 0.1s; }
+        .social-links a:nth-child(2) { animation-delay: 0.2s; }
+        .social-links a:nth-child(3) { animation-delay: 0.3s; }
+        .social-links a:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5);}
+            100% { opacity: 1; transform: scale(1);}
+        }
+
+        /* Animate contact form fields */
+        .contact-form .form-group {
+            animation: fadeInScale 0.7s cubic-bezier(.77,0,.18,1) both;
+        }
+        .contact-form .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .contact-form .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .contact-form .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .contact-form .form-group:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+    <script>
+        // Skill details for popup
+        const skillDetails = {
+            "Kubernetes": {
+                icon: "☸️",
+                title: "Kubernetes",
+                description: `<ul>
+                    <li>Designed and managed multi-node Kubernetes clusters for production workloads.</li>
+                    <li>Implemented Helm charts, RBAC, and custom controllers.</li>
+                    <li>Automated scaling, rolling updates, and zero-downtime deployments.</li>
+                    <li>Integrated monitoring and logging with Prometheus and Grafana.</li>
+                </ul>`
+            },
+            "Docker": {
+                icon: "🐳",
+                title: "Docker",
+                description: `<ul>
+                    <li>Containerized legacy and modern applications for consistency and scalability.</li>
+                    <li>Built custom Docker images and optimized multi-stage builds.</li>
+                    <li>Managed Docker Compose for local development and testing.</li>
+                </ul>`
+            },
+            "Cloud Platforms": {
+                icon: "☁️",
+                title: "Cloud Platforms",
+                description: `<ul>
+                    <li>Deployed and managed workloads on AWS, Azure, and OpenShift.</li>
+                    <li>Automated infrastructure provisioning using Terraform and ARM templates.</li>
+                    <li>Implemented cost optimization and security best practices.</li>
+                </ul>`
+            },
+            "Infrastructure as Code": {
+                icon: "🔧",
+                title: "Infrastructure as Code",
+                description: `<ul>
+                    <li>Automated infrastructure with Terraform and Ansible.</li>
+                    <li>Developed reusable modules and playbooks for rapid deployments.</li>
+                    <li>Integrated IaC with CI/CD pipelines for continuous delivery.</li>
+                </ul>`
+            },
+            "Monitoring": {
+                icon: "📊",
+                title: "Monitoring",
+                description: `<ul>
+                    <li>Set up Prometheus, Grafana, and OpenTelemetry for observability.</li>
+                    <li>Created custom dashboards and alerting rules.</li>
+                    <li>Enabled proactive monitoring and incident response.</li>
+                </ul>`
+            },
+            "CI/CD": {
+                icon: "🔄",
+                title: "CI/CD",
+                description: `<ul>
+                    <li>Built robust pipelines using Azure DevOps and GitHub Actions.</li>
+                    <li>Automated testing, building, and deployment processes.</li>
+                    <li>Reduced deployment times and improved release reliability.</li>
+                </ul>`
+            },
+            "Linux": {
+                icon: "🐧",
+                title: "Linux",
+                description: `<ul>
+                    <li>Expert in Linux system administration and troubleshooting.</li>
+                    <li>Automated tasks with Bash and Python scripts.</li>
+                    <li>Secured and optimized servers for performance and reliability.</li>
+                </ul>`
+            },
+            "Python": {
+                icon: "🐍",
+                title: "Python",
+                description: `<ul>
+                    <li>Developed automation scripts and REST APIs.</li>
+                    <li>Integrated Python with cloud and DevOps tools.</li>
+                    <li>Built internal tools for workflow optimization.</li>
+                </ul>`
+            }
+        };
+
+        // Skill popup logic
+        document.querySelectorAll('.skill-item').forEach(item => {
+            item.style.cursor = 'pointer';
+            item.addEventListener('mouseenter', function () {
+                this.style.boxShadow = '0 0 30px 5px #4ecdc4, 0 0 10px 2px #ff6b6b';
+                this.style.transition = 'box-shadow 0.3s';
+            });
+            item.addEventListener('mouseleave', function () {
+                this.style.boxShadow = '';
+            });
+            item.addEventListener('click', function () {
+                const skill = this.querySelector('h3').innerText.trim();
+                const modal = document.getElementById('skill-modal');
+                const modalBody = document.getElementById('skill-modal-body');
+                if (skillDetails[skill]) {
+                    modalBody.innerHTML = `
+                        <div style="text-align:center; animation: fadeIn 0.5s;">
+                            <div style="font-size:3rem; margin-bottom:10px; animation: bounce 1s;">${skillDetails[skill].icon}</div>
+                            <h2 style="margin-bottom:15px; background:linear-gradient(45deg,#ff6b6b,#4ecdc4);-webkit-background-clip:text;-webkit-text-fill-color:transparent; animation: textGlow 2s infinite;">${skillDetails[skill].title}</h2>
+                            <div style="text-align:left; animation: slideUp 0.7s;">${skillDetails[skill].description}</div>
+                        </div>
+                    `;
+                    modal.style.display = 'flex';
+                    modal.style.opacity = 0;
+                    setTimeout(() => { modal.style.opacity = 1; }, 10);
+                }
+            });
+        });
+        document.getElementById('skill-modal-close').onclick = function () {
+            const modal = document.getElementById('skill-modal');
+            modal.style.opacity = 0;
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+        };
+        document.getElementById('skill-modal').onclick = function (e) {
+            if (e.target === this) {
+                this.style.opacity = 0;
+                setTimeout(() => { this.style.display = 'none'; }, 300);
+            }
+        };
+    </script>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section fade-in">
+        <h2>Let's Work Together</h2>
+        <form class="contact-form" id="contact-form" action="https://formspree.io/f/mrgnklak" method="POST">
+            <div class="form-group">
+                <input type="text" name="name" placeholder="Your Name" required>
+            </div>
+            <div class="form-group">
+                <input type="email" name="email" placeholder="Your Email" required>
+            </div>
+            <div class="form-group">
+                <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="cta-button" style="display: block; text-align: center;">Send Message</button>
+            </div>
+            <div id="contact-status" style="margin-top:15px; text-align:center;"></div>
+        </form>
+        <script>
+            // Optional: Show status message after submission
+            document.getElementById('contact-form').addEventListener('submit', function(e) {
+                var status = document.getElementById('contact-status');
+                status.innerHTML = "Sending...";
+                // Let the form submit to Formspree, then show a message
+                this.addEventListener('submit', function() {
+                    setTimeout(function() {
+                        status.innerHTML = "Thank you! Your message has been sent.";
+                    }, 1000);
+                });
+            });
+        </script>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="social-links">
+            <a href="mailto:krishnakishore@inarm.in">📧</a>
+            <a href="https://www.linkedin.com/in/krishna-kishore--reddy">💼</a>
+            <a href="tel:+919493612730">📞</a>
+            <a href="https://www.inarm.in">🌐</a>
+        </div>
+        <p>&copy; 2024 Lieutenant Krishna Kishore Reddy. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            setTimeout(() => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            }, 100);
+        });
+
+        // Floating Particles
+        function createParticles() {
+            const particles = document.querySelector('.particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.width = Math.random() * 4 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particles.appendChild(particle);
+            }
+        }
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Interactive Work Items
+        document.querySelectorAll('.work-item').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.style.transform = 'translateY(-10px) rotateX(10deg)';
+            });
+            
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = 'translateY(0) rotateX(0deg)';
+            });
+        });
+
+        // Dynamic Navigation Background
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.style.background = 'rgba(0, 0, 0, 0.9)';
+                nav.style.backdropFilter = 'blur(20px)';
+            } else {
+                nav.style.background = 'rgba(0, 0, 0, 0.1)';
+                nav.style.backdropFilter = 'blur(10px)';
+            }
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            createParticles();
+        });
+
+        // Parallax Effect
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.bg-animation');
+            const speed = scrolled * 0.5;
+            parallax.style.transform = `translateY(${speed}px)`;
+        });
+
+        // Hover Effects for CTA Buttons
+        document.querySelectorAll('.cta-button').forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                button.style.boxShadow = '0 15px 35px rgba(255, 107, 107, 0.4)';
+                button.style.transform = 'scale(1.05) translateY(-2px)';
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                button.style.boxShadow = '0 10px 30px rgba(255, 107, 107, 0.3)';
+                button.style.transform = 'scale(1) translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
