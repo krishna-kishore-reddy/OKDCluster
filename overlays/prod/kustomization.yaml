@@ -10,6 +10,12 @@ patches:
       kind: Deployment
       name: nginx
 
+patches:
+  - path: patch-svc.yaml
+    target:
+      kind: Service
+      name: nginx
+
 labels:
   - pairs:
       environment: prod
