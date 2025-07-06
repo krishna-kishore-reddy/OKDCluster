@@ -1,0 +1,7 @@
+replicas: 2
+
+targetport: 8080
+
+type: NodePort
+
+
