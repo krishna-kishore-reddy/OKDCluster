@@ -1,0 +1,22 @@
+namePrefix: dev-
+nameSuffix: -v1
+
+resources:
+  - ../../base
+
+patchesStrategicMerge:
+  - patches/patch-image.yaml
+  - patches/patch-svc.yaml
+
+images:
+  - name: nginx-ownwebsite
+    newName: krishnakishore27/krishnakishorereddy
+    newTag: ownwebsite
+
+commonLabels:
+  environment: dev
+  team: devops
+
+commonAnnotations:
+  owner: krishna.k@company.com
+

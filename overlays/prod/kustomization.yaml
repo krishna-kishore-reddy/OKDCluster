@@ -1,0 +1,26 @@
+namePrefix: prod-
+nameSuffix: -v2
+
+resources:
+  - ../../base
+
+patches:
+  - path: patch-image.yaml
+    target:
+      kind: Deployment
+      name: nginx
+
+labels:
+  - pairs:
+      environment: prod
+      team: platform
+    includeSelectors: true
+
+images:
+  - name: nginx
+    newName: krishnakishore27/portfolio
+    newTag: latest
+
+commonAnnotations:
+  owner: platform@company.com
+
